@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+let api = 'https://grambogames-178022.appspot.com'
+
 export const state = () => ({
   authUser: null
 })
@@ -17,9 +19,22 @@ export const actions = {
       commit('SET_USER', req.session.authUser)
     }
   },
-  async login ({ commit }, { username, password }) {
+
+  async register ({ commit }, { email, password }) {
     try {
-      const { data } = await axios.post('/api/login', { username, password })
+      const { data } = await axios.post(`${api}/register`, { email, password })
+      commit('SET_USER', data)
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        throw new Error('Bad credentials')
+      }
+      throw error
+    }
+  },
+
+  async login ({ commit }, { email, password }) {
+    try {
+      const { data } = await axios.post(`${api}/login`, { email, password })
       commit('SET_USER', data)
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -30,7 +45,7 @@ export const actions = {
   },
 
   async logout ({ commit }) {
-    await axios.post('/api/logout')
+    await axios.post(`${api}/logout`)
     commit('SET_USER', null)
   }
 

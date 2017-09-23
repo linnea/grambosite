@@ -1,15 +1,26 @@
 <template>
   <div class="container">
-    <h1>Please login to see the secret content</h1>
-    <form v-if="!$store.state.authUser" @submit.prevent="login">
-      <p class="error" v-if="formError">{{ formError }}</p>
-      <p><i>To login, use <b>demo</b> as username and <b>demo</b> as password.</i></p>
-      <p>Username: <input type="text" v-model="formUsername" name="username" /></p>
-      <p>Password: <input type="password" v-model="formPassword" name="password" /></p>
-      <button type="submit">Login</button>
-    </form>
+    <div v-if="!$store.state.authUser">
+      <h1>Login</h1>
+      <form @submit.prevent="login">
+        <p class="error" v-if="formError">{{ formError }}</p>
+        <p><i>To login, use <b>demo</b> as email and <b>demo</b> as password.</i></p>
+        <p>Email: <input type="text" v-model="formEmail" name="email" /></p>
+        <p>Password: <input type="password" v-model="formPassword" name="password" /></p>
+        <button type="submit">Login</button>
+      </form>
+
+      </h2>Register</h2>
+      <form @submit.prevent="register">
+        <p class="error" v-if="formError">{{ formError }}</p>
+        <p>Email: <input type="text" v-model="formEmail" name="email" /></p>
+        <p>Password: <input type="password" v-model="formPassword" name="password" /></p>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+
     <div v-else>
-      Hello {{ $store.state.authUser.username }}!
+      Hello {{ $store.state.authUser.email }}!
       <pre>I am the secret content, I am shown only when the use is connected.</pre>
       <p><i>You can also refresh this page, you'll still be connected!</i></p>
       <button @click="logout">Logout</button>
@@ -23,18 +34,32 @@ export default {
   data () {
     return {
       formError: null,
-      formUsername: '',
+      formEmail: '',
       formPassword: ''
     }
   },
   methods: {
+    async register () {
+      try {
+        await this.$store.dispatch('register', {
+          email: this.formEmail,
+          password: this.formPassword
+        })
+        this.formEmail = ''
+        this.formPassword = ''
+        this.formError = null
+      } catch (e) {
+        this.formError = e.message
+      }
+    },
+
     async login () {
       try {
         await this.$store.dispatch('login', {
-          username: this.formUsername,
+          email: this.formEmail,
           password: this.formPassword
         })
-        this.formUsername = ''
+        this.formEmail = ''
         this.formPassword = ''
         this.formError = null
       } catch (e) {
